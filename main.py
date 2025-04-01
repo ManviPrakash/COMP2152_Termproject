@@ -3,6 +3,7 @@ import os
 import platform
 from hero import Hero
 from monster import Monster
+from enemy import Enemy  # Import the Enemy class
 
 # Define Dice, Weapons, Loot, and Powers
 small_dice_options = list(range(1, 7))
@@ -48,7 +49,7 @@ num_stars = 0
 input_invalid = True
 i = 0
 
-# Input Validation for Combat Strength
+# Input Validation for Combat Strength and Hero Level
 while input_invalid and i < 5:
     print("    ------------------------------------------------------------------")
     combat_strength = input("Enter your combat Strength (1-6): ")
@@ -66,14 +67,39 @@ while input_invalid and i < 5:
         i += 1
         continue
 
+    # Ask for Hero's Level
+    hero_level = input("Enter your Hero's level (1-100): ")
+
+    if not hero_level.isnumeric() or not (1 <= int(hero_level) <= 100):
+        print("Invalid level. Please enter a number between 1 and 100.")
+        i += 1
+        continue
+
+    hero_level = int(hero_level)
+
     input_invalid = False
 
 if not input_invalid:
-    hero = Hero(combat_strength)
+    # Now creating the Hero with both combat_strength and level
+    hero = Hero(combat_strength, hero_level)
     monster = Monster(m_combat_strength)
 
     # Roll for weapon
     input("Roll the dice for your weapon (Press enter)")
+    ascii_image5 = """
+              , %               .           
+   *      @./  #         @  &.(         
+  @        /@   (      ,    @       # @ 
+  @        ..@#% @     @&*#@(         % 
+   &   (  @    (   / /   *    @  .   /  
+     @ % #         /   .       @ ( @    
+                 %   .@*                
+               #         .              
+             /     # @   *              
+                 ,     %                
+            @&@           @&
+            """
+    print(ascii_image5)
     weapon_roll = random.choice(small_dice_options)
     hero.set_weapon(weapon_roll, weapons)
 
@@ -102,7 +128,7 @@ if not input_invalid:
     power_roll = random.choice(list(monster_powers.keys()))
     monster.increase_strength(monster_powers[power_roll])
 
-    # Fight Sequence
+    # Fight with Monster Sequence
     print("    ------------------------------------------------------------------")
     print("    |    You meet the monster. FIGHT!!")
     while hero.health_points > 0 and monster.health_points > 0:
@@ -127,6 +153,54 @@ if not input_invalid:
             hero.attack(monster)
 
     winner = "Hero" if monster.health_points == 0 else "Monster"
+
+    # NEW FEATURE: Hero Fights an Enemy Based on Combat Strength
+    print("    ------------------------------------------------------------------")
+    print("    |    Now, you must fight an enemy!")
+    enemy_combat_strength = combat_strength  # The enemy's strength is based on the hero's combat strength
+    enemy = Enemy(enemy_combat_strength)  # Create a new enemy object
+    enemy.set_health(random.choice(big_dice_options))  # Set enemy's health
+
+    # Fight with Enemy Sequence
+    while hero.health_points > 0 and enemy.health_points > 0:
+        input("Roll to see who strikes first (Press enter)")
+
+        attack_roll = random.choice(small_dice_options)
+
+        if attack_roll % 2 != 0:
+            # Hero strikes first
+            input("You strike (Press enter)")
+            hero.attack(enemy)
+            print(f"Enemy's health after your attack: {enemy.health_points}")
+
+            if enemy.health_points == 0:
+                num_stars += 1  # Add stars for defeating the enemy
+                print("Enemy defeated!")
+                break
+
+            # Enemy strikes
+            input("The enemy strikes (Press enter)")
+            enemy.monster_attacks(hero)
+            print(f"Hero's health after enemy's attack: {hero.health_points}")
+
+        else:
+            # Enemy strikes first
+            input("The Enemy strikes first (Press enter)")
+            enemy.monster_attacks(hero)
+            print(f"Hero's health after enemy's attack: {hero.health_points}")
+
+            if hero.health_points == 0:
+                num_stars = 0  # Hero loses stars if defeated by enemy
+                print("Hero defeated!")
+                break
+
+            # Hero strikes back
+            input("You strike back!! (Press enter)")
+            hero.attack(enemy)
+            print(f"Enemy's health after your attack: {enemy.health_points}")
+
+    # Determine winner
+    enemy_winner = "Hero" if enemy.health_points == 0 else "Enemy"
 
     # Final Score Display
     tries = 0

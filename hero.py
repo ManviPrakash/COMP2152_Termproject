@@ -2,10 +2,12 @@ import random
 from character import Character  # Import the Character class
 
 class Hero(Character):
-    def __init__(self, combat_strength=None):
-        super().__init__()
-        self.combat_strength = combat_strength if combat_strength else random.randint(1, 6)
-        self.health_points = random.randint(10, 30)
+    def __init__(self, name=None, level=None, combat_strength=None):
+        super().__init__()  # Call the constructor of the parent class (Character)
+        self.name = name if name else "Unnamed Hero"
+        self.level = level if level else 1  # Default level is 1 if not specified
+        self.combat_strength = combat_strength if combat_strength else random.randint(1, 6)  # Random combat strength if not provided
+        self.health_points = random.randint(10, 30)  # Random health points between 10 and 30
         self.weapon = None
         self.belt = []  # Store collected loot items
 
