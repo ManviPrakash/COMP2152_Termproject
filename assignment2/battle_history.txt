@@ -1,0 +1,1 @@
+    |    Monster dealt 12. Hero has 0 health points remaining.
