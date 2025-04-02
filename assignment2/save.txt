@@ -1,2 +1,0 @@
-Monster has killed the hero previously.
-Total Monsters Killed: 0
